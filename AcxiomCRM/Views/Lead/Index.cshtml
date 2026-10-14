@@ -1,0 +1,142 @@
+@model IEnumerable<AcxiomCRM.Models.Lead>
+@{
+    ViewData["Title"] = "Lead Management";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid px-lg-4 py-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Lead Management</h1>
+            <p class="text-muted small mb-0">Capture, qualify, assign, and convert prospective sales leads.</p>
+        </div>
+        <a asp-action="Create" class="btn btn-amber">
+            <i class="bi bi-funnel me-1"></i>New Lead
+        </a>
+    </div>
+
+    <!-- Search & Filter Card -->
+    <div class="acxiom-card p-3 mb-4">
+        <form method="get" class="row g-2 align-items-center">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-muted">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" name="search" value="@ViewData["CurrentSearch"]"
+                           class="form-control" placeholder="Search by lead name, company, email, code..." />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="New" selected="@(ViewData["CurrentStatus"]?.ToString() == "New")">New</option>
+                    <option value="Contacted" selected="@(ViewData["CurrentStatus"]?.ToString() == "Contacted")">Contacted</option>
+                    <option value="Qualified" selected="@(ViewData["CurrentStatus"]?.ToString() == "Qualified")">Qualified</option>
+                    <option value="Converted" selected="@(ViewData["CurrentStatus"]?.ToString() == "Converted")">Converted</option>
+                    <option value="Lost" selected="@(ViewData["CurrentStatus"]?.ToString() == "Lost")">Lost</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="priority" class="form-select">
+                    <option value="">All Priorities</option>
+                    <option value="High" selected="@(ViewData["CurrentPriority"]?.ToString() == "High")">High</option>
+                    <option value="Medium" selected="@(ViewData["CurrentPriority"]?.ToString() == "Medium")">Medium</option>
+                    <option value="Low" selected="@(ViewData["CurrentPriority"]?.ToString() == "Low")">Low</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-outline-light w-100">Filter</button>
+            </div>
+            <div class="col-md-1">
+                <a asp-action="Index" class="btn btn-outline-secondary w-100">Reset</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Leads Table -->
+    <div class="acxiom-card overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-dark-custom align-middle">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Lead / Organization</th>
+                        <th>Contact</th>
+                        <th>Source</th>
+                        <th>Priority</th>
+                        <th>Expected Value</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                                No leads match your filter criteria.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var l in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="badge bg-dark border border-secondary text-warning font-monospace">@l.LeadCode</span>
+                                </td>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@l.LeadId" class="fw-semibold text-light text-decoration-none">
+                                        @l.LeadName
+                                    </a>
+                                    @if (!string.IsNullOrWhiteSpace(l.CompanyName))
+                                    {
+                                        <div class="text-muted small">@l.CompanyName</div>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="small">@l.Email</div>
+                                    <div class="text-muted small">@l.Phone</div>
+                                </td>
+                                <td><span class="badge bg-secondary-subtle text-light border border-secondary">@l.Source</span></td>
+                                <td>
+                                    @if (l.Priority == "High") { <span class="badge bg-danger text-light">High</span> }
+                                    else if (l.Priority == "Medium") { <span class="badge bg-warning text-dark">Medium</span> }
+                                    else { <span class="badge bg-secondary">Low</span> }
+                                </td>
+                                <td class="fw-bold text-warning">$@l.ExpectedValue.ToString("N0")</td>
+                                <td>
+                                    @if (l.Status == "Converted") { <span class="badge bg-success">Converted</span> }
+                                    else if (l.Status == "Qualified") { <span class="badge bg-info text-dark">Qualified</span> }
+                                    else if (l.Status == "Contacted") { <span class="badge bg-primary">Contacted</span> }
+                                    else if (l.Status == "New") { <span class="badge bg-warning text-dark">New</span> }
+                                    else { <span class="badge bg-secondary">@l.Status</span> }
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        @if (l.Status != "Converted")
+                                        {
+                                            <a asp-action="Convert" asp-route-id="@l.LeadId" class="btn btn-outline-success" title="Convert to Customer & Deal">
+                                                <i class="bi bi-arrow-repeat me-1"></i>Convert
+                                            </a>
+                                        }
+                                        <a asp-action="Details" asp-route-id="@l.LeadId" class="btn btn-outline-light" title="Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@l.LeadId" class="btn btn-outline-warning" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

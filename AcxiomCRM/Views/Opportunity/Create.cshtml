@@ -1,0 +1,107 @@
+@model AcxiomCRM.Models.Opportunity
+@{
+    ViewData["Title"] = "New Opportunity";
+    Layout = "_Layout";
+}
+
+<div class="container py-4" style="max-width: 800px;">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Create Sales Opportunity</h1>
+            <p class="text-muted small mb-0">Record a deal into the pipeline for revenue forecasting.</p>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Back to Deals
+        </a>
+    </div>
+
+    <div class="acxiom-card p-4">
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+
+            <div class="row g-3">
+                <div class="col-12">
+                    <label asp-for="OpportunityName" class="form-label">Opportunity / Deal Name <span class="text-danger">*</span></label>
+                    <input asp-for="OpportunityName" class="form-control" placeholder="e.g. Enterprise Cloud Deployment" required />
+                    <span asp-validation-for="OpportunityName" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="CustomerId" class="form-label">Associated Customer Account</label>
+                    <select asp-for="CustomerId" asp-items="ViewBag.CustomersList" class="form-select">
+                        <option value="">-- Select Customer Account --</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Amount" class="form-label">Deal Amount ($) <span class="text-danger">*</span></label>
+                    <input asp-for="Amount" type="number" step="100" min="1" class="form-control" required />
+                    <span asp-validation-for="Amount" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="Stage" class="form-label">Pipeline Stage</label>
+                    <select asp-for="Stage" class="form-select" id="stageSelect">
+                        <option value="Qualification">Qualification</option>
+                        <option value="Proposal">Proposal</option>
+                        <option value="Negotiation">Negotiation</option>
+                        <option value="Won">Won</option>
+                        <option value="Lost">Lost</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="Probability" class="form-label">Win Probability (%)</label>
+                    <input asp-for="Probability" type="number" min="0" max="100" class="form-control" id="probInput" />
+                    <span asp-validation-for="Probability" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="ExpectedCloseDate" class="form-label">Expected Close Date <span class="text-danger">*</span></label>
+                    <input asp-for="ExpectedCloseDate" type="date" class="form-control" required />
+                    <span asp-validation-for="ExpectedCloseDate" class="text-danger small"></span>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="AssignedTo" class="form-label">Assigned Sales Executive</label>
+                    <select asp-for="AssignedTo" asp-items="ViewBag.UsersList" class="form-select">
+                        <option value="">-- Assign to User --</option>
+                    </select>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="Notes" class="form-label">Notes & Requirements</label>
+                    <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Deal scope, customer pain points, competitive notes..."></textarea>
+                </div>
+            </div>
+
+            <hr class="my-4 border-secondary opacity-50" />
+
+            <div class="d-flex justify-content-end gap-2">
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" class="btn btn-amber px-4">
+                    <i class="bi bi-check2-circle me-1"></i>Save Opportunity
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const stageSelect = document.getElementById('stageSelect');
+        const probInput = document.getElementById('probInput');
+
+        if (stageSelect && probInput) {
+            stageSelect.addEventListener('change', function () {
+                if (this.value === 'Qualification') probInput.value = 20;
+                else if (this.value === 'Proposal') probInput.value = 50;
+                else if (this.value === 'Negotiation') probInput.value = 80;
+                else if (this.value === 'Won') probInput.value = 100;
+                else if (this.value === 'Lost') probInput.value = 0;
+            });
+        }
+    </script>
+}

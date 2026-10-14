@@ -1,0 +1,182 @@
+@model AcxiomCRM.Models.Customer
+@{
+    ViewData["Title"] = Model.CustomerName;
+    Layout = "_Layout";
+}
+
+<div class="container-fluid px-lg-4 py-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-dark border border-secondary text-warning font-monospace">@Model.CustomerCode</span>
+                <h1 class="h3 fw-bold mb-0">@Model.CustomerName</h1>
+                @if (Model.Status == "Active")
+                {
+                    <span class="badge bg-success-subtle text-success border border-success">Active</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Inactive</span>
+                }
+            </div>
+            <p class="text-muted small mb-0">@(Model.CompanyName ?? "Individual Account") &bull; Added on @Model.CreatedDate.ToString("MMMM dd, yyyy")</p>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>Directory
+            </a>
+            <a asp-action="Edit" asp-route-id="@Model.CustomerId" class="btn btn-outline-warning btn-sm">
+                <i class="bi bi-pencil me-1"></i>Edit Profile
+            </a>
+            <a asp-controller="Opportunity" asp-action="Create" asp-route-customerId="@Model.CustomerId" class="btn btn-amber btn-sm">
+                <i class="bi bi-briefcase-fill me-1"></i>New Opportunity
+            </a>
+            <a asp-controller="FollowUp" asp-action="Create" asp-route-customerId="@Model.CustomerId" class="btn btn-outline-success btn-sm">
+                <i class="bi bi-calendar-plus me-1"></i>Follow-Up
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Contact & Profile Details Card -->
+        <div class="col-lg-4">
+            <div class="acxiom-card p-4 h-100">
+                <h6 class="fw-bold text-light mb-3 pb-2 border-bottom border-secondary">
+                    <i class="bi bi-person-lines-fill text-warning me-2"></i>Contact Information
+                </h6>
+
+                <div class="mb-3">
+                    <label class="text-muted small d-block">Email Address</label>
+                    <a href="mailto:@Model.Email" class="text-info text-decoration-none fw-medium">@Model.Email</a>
+                </div>
+
+                <div class="mb-3">
+                    <label class="text-muted small d-block">Phone Number</label>
+                    <span class="text-light fw-medium">@Model.Phone</span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="text-muted small d-block">Company</label>
+                    <span class="text-light">@(Model.CompanyName ?? "—")</span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="text-muted small d-block">Address</label>
+                    <span class="text-light">
+                        @(string.IsNullOrWhiteSpace(Model.Address) ? "—" : Model.Address)
+                        @if (!string.IsNullOrWhiteSpace(Model.City))
+                        {
+                            <div>@Model.City, @Model.State</div>
+                        }
+                    </span>
+                </div>
+
+                <div class="mt-4 pt-3 border-top border-secondary small text-muted">
+                    <div>Created by: <span class="text-light">@(Model.CreatedBy ?? "System")</span></div>
+                    <div>Account Owner: <span class="text-light">@(Model.OwnerId ?? "Unassigned")</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Deals & History Tabs -->
+        <div class="col-lg-8">
+            <div class="acxiom-card p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold text-light mb-0">
+                        <i class="bi bi-briefcase text-warning me-2"></i>Associated Opportunities
+                        <span class="badge bg-secondary ms-2">@Model.Opportunities.Count</span>
+                    </h6>
+                    <a asp-controller="Opportunity" asp-action="Create" asp-route-customerId="@Model.CustomerId" class="btn btn-sm btn-outline-warning">
+                        + Add Deal
+                    </a>
+                </div>
+
+                @if (!Model.Opportunities.Any())
+                {
+                    <div class="text-center py-4 text-muted small">
+                        No active or closed opportunities linked to this customer.
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-dark-custom table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Opportunity</th>
+                                    <th>Amount</th>
+                                    <th>Stage</th>
+                                    <th>Probability</th>
+                                    <th>Expected Close</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var opp in Model.Opportunities)
+                                {
+                                    <tr>
+                                        <td class="fw-medium">
+                                            <a asp-controller="Opportunity" asp-action="Details" asp-route-id="@opp.OpportunityId" class="text-light text-decoration-none">
+                                                @opp.OpportunityName
+                                            </a>
+                                        </td>
+                                        <td class="fw-bold text-warning">$@opp.Amount.ToString("N0")</td>
+                                        <td>
+                                            <span class="badge bg-secondary" style="font-size:0.7rem;">@opp.Stage</span>
+                                        </td>
+                                        <td>@opp.Probability%</td>
+                                        <td class="small text-muted">@opp.ExpectedCloseDate.ToString("yyyy-MM-dd")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+
+            <!-- Follow-Ups Card -->
+            <div class="acxiom-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold text-light mb-0">
+                        <i class="bi bi-calendar2-check text-info me-2"></i>Follow-Up History & Schedule
+                        <span class="badge bg-secondary ms-2">@Model.FollowUps.Count</span>
+                    </h6>
+                    <a asp-controller="FollowUp" asp-action="Create" asp-route-customerId="@Model.CustomerId" class="btn btn-sm btn-outline-info">
+                        + Schedule
+                    </a>
+                </div>
+
+                @if (!Model.FollowUps.Any())
+                {
+                    <div class="text-center py-4 text-muted small">
+                        No follow-up interactions recorded.
+                    </div>
+                }
+                else
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var f in Model.FollowUps.OrderByDescending(f => f.FollowUpDate))
+                        {
+                            <div class="list-group-item bg-transparent text-light border-secondary px-0 py-2 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-semibold small">
+                                        <span class="badge bg-info me-1">@f.FollowUpType</span>
+                                        @(f.Subject ?? "Customer follow-up")
+                                    </div>
+                                    <div class="text-muted" style="font-size: 0.78rem;">
+                                        Date: <strong class="text-light">@f.FollowUpDate.ToString("MMM dd, yyyy HH:mm")</strong>
+                                        @if (!string.IsNullOrWhiteSpace(f.Remarks)) { <span> &bull; @f.Remarks</span> }
+                                    </div>
+                                </div>
+                                <span class="badge @(f.Status == "Completed" ? "bg-success" : (f.Status == "Planned" ? "bg-primary" : "bg-danger"))" style="font-size: 0.7rem;">
+                                    @f.Status
+                                </span>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

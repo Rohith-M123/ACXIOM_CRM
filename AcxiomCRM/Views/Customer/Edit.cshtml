@@ -1,0 +1,122 @@
+@model AcxiomCRM.Models.Customer
+@{
+    ViewData["Title"] = "Edit Customer";
+    Layout = "_Layout";
+}
+
+<div class="container py-4" style="max-width: 800px;">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Edit Customer</h1>
+            <p class="text-muted small mb-0">Update information for customer <span class="text-warning font-monospace">@Model.CustomerCode</span></p>
+        </div>
+        <a asp-action="Details" asp-route-id="@Model.CustomerId" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Back to Details
+        </a>
+    </div>
+
+    <div class="acxiom-card p-4">
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="CustomerId" />
+            <input type="hidden" asp-for="CustomerCode" />
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4" role="alert"></div>
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label text-muted">Customer Code</label>
+                    <input class="form-control font-monospace" value="@Model.CustomerCode" readonly disabled />
+                </div>
+
+                <div class="col-md-8">
+                    <label asp-for="CustomerName" class="form-label">Customer / Account Name <span class="text-danger">*</span></label>
+                    <input asp-for="CustomerName" class="form-control" required />
+                    <span asp-validation-for="CustomerName" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                    <input asp-for="Email" type="email" class="form-control" required />
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                    <input asp-for="Phone" class="form-control" required />
+                    <span asp-validation-for="Phone" class="text-danger small"></span>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="CompanyName" class="form-label">Legal Company Name</label>
+                    <input asp-for="CompanyName" class="form-control" />
+                    <span asp-validation-for="CompanyName" class="text-danger small"></span>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="Address" class="form-label">Street Address</label>
+                    <input asp-for="Address" class="form-control" />
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="City" class="form-label">City</label>
+                    <input asp-for="City" class="form-control" />
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="State" class="form-label">State / Province</label>
+                    <input asp-for="State" class="form-control" />
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Status" class="form-label">Status</label>
+                    <select asp-for="Status" class="form-select">
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
+            </div>
+
+            <hr class="my-4 border-secondary opacity-50" />
+
+            <div class="d-flex justify-content-between align-items-center">
+                <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deactivateModal">
+                    <i class="bi bi-slash-circle me-1"></i>Deactivate Customer
+                </button>
+
+                <div class="d-flex gap-2">
+                    <a asp-action="Details" asp-route-id="@Model.CustomerId" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-amber px-4">
+                        <i class="bi bi-check2 me-1"></i>Save Changes
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Deactivation Confirmation Modal -->
+<div class="modal fade" id="deactivateModal" tabindex="-1" aria-labelledby="deactivateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deactivateModalLabel">Confirm Deactivation</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to deactivate customer <strong>@Model.CustomerName</strong>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form asp-action="Delete" asp-route-id="@Model.CustomerId" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Yes, Deactivate</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

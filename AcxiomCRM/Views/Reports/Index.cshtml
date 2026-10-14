@@ -1,0 +1,280 @@
+@{
+    ViewData["Title"] = "Reports & Analytics";
+    Layout = "_Layout";
+    var reportType = ViewData["ReportType"]?.ToString() ?? "Pipeline";
+
+    var customers = ViewBag.Customers as List<AcxiomCRM.Models.Customer> ?? new();
+    var leads = ViewBag.Leads as List<AcxiomCRM.Models.Lead> ?? new();
+    var opps = ViewBag.Opportunities as List<AcxiomCRM.Models.Opportunity> ?? new();
+    var followUps = ViewBag.FollowUps as List<AcxiomCRM.Models.FollowUp> ?? new();
+    var auditLogs = ViewBag.AuditLogs as List<AcxiomCRM.Models.AuditLog> ?? new();
+}
+
+<div class="container-fluid px-lg-4 py-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1">CRM Reports & Analytics</h1>
+            <p class="text-muted small mb-0">Generate, inspect, and analyze sales performance, conversion metrics, and audit history.</p>
+        </div>
+        <button type="button" class="btn btn-outline-light btn-sm" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i>Print Report
+        </button>
+    </div>
+
+    <!-- Report Type Tabs -->
+    <ul class="nav nav-pills mb-4 gap-2">
+        <li class="nav-item">
+            <a class="nav-link @(reportType == "Pipeline" ? "active bg-warning text-dark fw-semibold" : "text-light bg-dark border border-secondary")"
+               asp-action="Index" asp-route-reportType="Pipeline">
+                <i class="bi bi-funnel-fill me-1"></i>Pipeline Report
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(reportType == "Leads" ? "active bg-warning text-dark fw-semibold" : "text-light bg-dark border border-secondary")"
+               asp-action="Index" asp-route-reportType="Leads">
+                <i class="bi bi-arrow-repeat me-1"></i>Lead Conversion Report
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(reportType == "Customers" ? "active bg-warning text-dark fw-semibold" : "text-light bg-dark border border-secondary")"
+               asp-action="Index" asp-route-reportType="Customers">
+                <i class="bi bi-people-fill me-1"></i>Customer Directory Report
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(reportType == "FollowUps" ? "active bg-warning text-dark fw-semibold" : "text-light bg-dark border border-secondary")"
+               asp-action="Index" asp-route-reportType="FollowUps">
+                <i class="bi bi-calendar-check-fill me-1"></i>Follow-Up Activity Report
+            </a>
+        </li>
+        @if (User.IsInRole("Admin"))
+        {
+            <li class="nav-item">
+                <a class="nav-link @(reportType == "Audit" ? "active bg-warning text-dark fw-semibold" : "text-light bg-dark border border-secondary")"
+                   asp-action="Index" asp-route-reportType="Audit">
+                    <i class="bi bi-journal-text me-1"></i>Audit Trail Report
+                </a>
+            </li>
+        }
+    </ul>
+
+    <!-- Report Body -->
+    @if (reportType == "Pipeline")
+    {
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <span class="text-muted small">TOTAL OPPORTUNITIES</span>
+                    <div class="h3 fw-bold text-light mb-0 mt-1">@opps.Count</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <span class="text-muted small">TOTAL PIPELINE VALUE</span>
+                    <div class="h3 fw-bold text-warning mb-0 mt-1">$@opps.Sum(o => o.Amount).ToString("N0")</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <span class="text-muted small">TOTAL WEIGHTED VALUE</span>
+                    <div class="h3 fw-bold text-success mb-0 mt-1">$@opps.Sum(o => o.WeightedAmount).ToString("N0")</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="acxiom-card overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-dark-custom align-middle">
+                    <thead>
+                        <tr>
+                            <th>Opportunity Name</th>
+                            <th>Customer</th>
+                            <th>Amount</th>
+                            <th>Stage</th>
+                            <th>Probability</th>
+                            <th>Weighted Amount</th>
+                            <th>Expected Close</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var o in opps)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@o.OpportunityName</td>
+                                <td class="small">@(o.Customer?.CustomerName ?? "—")</td>
+                                <td class="fw-bold text-warning">$@o.Amount.ToString("N0")</td>
+                                <td><span class="badge bg-secondary">@o.Stage</span></td>
+                                <td>@o.Probability%</td>
+                                <td class="text-success fw-medium">$@o.WeightedAmount.ToString("N0")</td>
+                                <td class="small text-muted">@o.ExpectedCloseDate.ToString("yyyy-MM-dd")</td>
+                                <td><span class="badge @(o.Status == "Won" ? "bg-success" : (o.Status == "Lost" ? "bg-danger" : "bg-primary"))">@o.Status</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else if (reportType == "Leads")
+    {
+        var convertedCount = leads.Count(l => l.Status == "Converted");
+        var conversionRate = leads.Any() ? (convertedCount * 100.0 / leads.Count) : 0;
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <span class="text-muted small">TOTAL PROSPECTIVE LEADS</span>
+                    <div class="h3 fw-bold text-light mb-0 mt-1">@leads.Count</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <span class="text-muted small">CONVERTED TO CUSTOMERS</span>
+                    <div class="h3 fw-bold text-success mb-0 mt-1">@convertedCount</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <span class="text-muted small">CONVERSION EFFICIENCY RATE</span>
+                    <div class="h3 fw-bold text-warning mb-0 mt-1">@conversionRate.ToString("F1")%</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="acxiom-card overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-dark-custom align-middle">
+                    <thead>
+                        <tr>
+                            <th>Lead Code</th>
+                            <th>Lead Name</th>
+                            <th>Company</th>
+                            <th>Source</th>
+                            <th>Priority</th>
+                            <th>Expected Value</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var l in leads)
+                        {
+                            <tr>
+                                <td><span class="badge bg-dark font-monospace text-warning">@l.LeadCode</span></td>
+                                <td class="fw-semibold">@l.LeadName</td>
+                                <td>@(l.CompanyName ?? "—")</td>
+                                <td>@l.Source</td>
+                                <td><span class="badge bg-secondary">@l.Priority</span></td>
+                                <td class="fw-bold text-warning">$@l.ExpectedValue.ToString("N0")</td>
+                                <td>
+                                    <span class="badge @(l.Status == "Converted" ? "bg-success" : (l.Status == "Qualified" ? "bg-info text-dark" : "bg-secondary"))">
+                                        @l.Status
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else if (reportType == "Customers")
+    {
+        <div class="acxiom-card overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-dark-custom align-middle">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Customer Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Company</th>
+                            <th>Status</th>
+                            <th>Created Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var c in customers)
+                        {
+                            <tr>
+                                <td><span class="badge bg-dark font-monospace text-warning">@c.CustomerCode</span></td>
+                                <td class="fw-semibold">@c.CustomerName</td>
+                                <td>@c.Email</td>
+                                <td>@c.Phone</td>
+                                <td>@(c.CompanyName ?? "—")</td>
+                                <td><span class="badge @(c.Status == "Active" ? "bg-success" : "bg-secondary")">@c.Status</span></td>
+                                <td class="small text-muted">@c.CreatedDate.ToString("yyyy-MM-dd")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else if (reportType == "FollowUps")
+    {
+        <div class="acxiom-card overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-dark-custom align-middle">
+                    <thead>
+                        <tr>
+                            <th>Activity Date</th>
+                            <th>Type</th>
+                            <th>Subject</th>
+                            <th>Account / Lead</th>
+                            <th>Status</th>
+                            <th>Assigned To</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var f in followUps)
+                        {
+                            <tr>
+                                <td class="fw-semibold text-light">@f.FollowUpDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td><span class="badge bg-primary">@f.FollowUpType</span></td>
+                                <td>@(f.Subject ?? "Follow-up")</td>
+                                <td>@(f.Customer?.CustomerName ?? f.Lead?.LeadName ?? "—")</td>
+                                <td><span class="badge @(f.Status == "Completed" ? "bg-success" : (f.Status == "Planned" ? "bg-warning text-dark" : "bg-danger"))">@f.Status</span></td>
+                                <td class="small text-muted">@(f.AssignedTo ?? "Unassigned")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else if (reportType == "Audit")
+    {
+        <div class="acxiom-card overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-dark-custom align-middle">
+                    <thead>
+                        <tr>
+                            <th>Timestamp (UTC)</th>
+                            <th>User</th>
+                            <th>Action</th>
+                            <th>Entity</th>
+                            <th>Record Id</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var a in auditLogs)
+                        {
+                            <tr>
+                                <td class="small text-muted">@a.CreatedDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                <td class="fw-semibold text-light">@a.UserId</td>
+                                <td><span class="badge bg-secondary">@a.Action</span></td>
+                                <td><span class="badge bg-dark border border-secondary text-warning">@a.EntityName</span></td>
+                                <td class="small font-monospace">@(a.RecordId ?? "—")</td>
+                                <td class="small text-muted">@(a.NewValue ?? a.OldValue ?? "—")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

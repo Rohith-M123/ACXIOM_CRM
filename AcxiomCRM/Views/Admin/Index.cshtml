@@ -1,70 +1,108 @@
 @{
-    ViewData["Title"] = "Admin Panel";
+    ViewData["Title"] = "Administration Overview";
     Layout = "_Layout";
-
-    var modules = new[]
-    {
-        (Icon: "bi-people-fill",              Color: "warning", Title: "User Management",  Desc: "Manage user accounts, roles, and permissions.",              Active: true),
-        (Icon: "bi-database-fill-gear",       Color: "info",    Title: "System Settings",  Desc: "Configure application-wide settings and preferences.",       Active: false),
-        (Icon: "bi-file-earmark-bar-graph-fill", Color: "success", Title: "Audit Logs",   Desc: "View all system activity and user actions.",                 Active: false),
-        (Icon: "bi-envelope-fill",            Color: "danger",  Title: "Notifications",   Desc: "Configure system alerts and email notifications.",           Active: false)
-    };
 }
 
-<div class="role-header">
-    <div class="container">
-        <div class="d-flex align-items-center gap-3">
-            <div class="stat-icon" style="background:rgba(245,158,11,0.2); width:56px; height:56px; border-radius:14px; flex-shrink:0;">
-                <i class="bi bi-shield-lock-fill text-warning" style="font-size:1.6rem;"></i>
-            </div>
-            <div>
-                <span class="badge bg-warning text-dark mb-1" style="font-size:0.7rem; letter-spacing:1px;">ADMIN ONLY</span>
-                <h1 class="h3 fw-bold mb-0">Administration Panel</h1>
-                <p class="text-muted mb-0 small">Full system access — restricted to Administrators</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="container py-5">
-
-    <!-- Authorization verified card -->
-    <div class="acxiom-card p-4 mb-4 d-flex align-items-start gap-3"
-         style="border-left:3px solid var(--acxiom-amber);">
-        <i class="bi bi-check-circle-fill text-amber mt-1" style="font-size:1.3rem; flex-shrink:0;"></i>
+<div class="container-fluid px-lg-4 py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <div>
-            <h6 class="fw-bold mb-1 text-amber">Authorization Verified ✓</h6>
-            <p class="text-muted mb-0 small">
-                You are signed in as <strong class="text-light">@User.Identity?.Name</strong> with the
-                <strong class="text-warning">Admin</strong> role.
-                This page is correctly restricted — only Administrators can see this.
-            </p>
+            <h1 class="h3 fw-bold mb-1">
+                <i class="bi bi-shield-lock-fill text-warning me-2"></i>Administration Panel
+            </h1>
+            <p class="text-muted small mb-0">System administration, access control, user provisioning, and compliance auditing.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="CreateUser" class="btn btn-amber btn-sm">
+                <i class="bi bi-person-plus-fill me-1"></i>Create User
+            </a>
+            <a asp-action="AuditLogs" class="btn btn-outline-light btn-sm">
+                <i class="bi bi-journal-text me-1"></i>Audit Trail
+            </a>
         </div>
     </div>
 
-    <h6 class="text-muted text-uppercase fw-bold small mb-3">
-        <i class="bi bi-grid me-2"></i>Administration Modules
-    </h6>
-    <div class="row g-4">
-        @foreach (var m in modules)
-        {
-            <div class="col-sm-6 col-xl-3">
-                <div class="stat-card h-100 @(m.Active ? "" : "opacity-50")">
-                    <div class="stat-icon" style="background:rgba(255,255,255,0.06);">
-                        <i class="bi @m.Icon text-@m.Color"></i>
-                    </div>
-                    <div class="fw-semibold mb-1">@m.Title</div>
-                    <div class="text-muted small mb-2">@m.Desc</div>
-                    @if (m.Active)
-                    {
-                        <span class="badge" style="background:rgba(245,158,11,0.2); color:var(--acxiom-amber); font-size:0.65rem;">Active</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-secondary" style="font-size:0.65rem;">Phase 2</span>
-                    }
+    <!-- Quick Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+                <span class="text-muted small fw-semibold">REGISTERED USERS</span>
+                <div class="h3 fw-bold text-light mb-0 mt-1">@ViewBag.TotalUsers</div>
+                <div class="small mt-2">
+                    <a asp-action="Users" class="text-warning text-decoration-none">Manage accounts &rarr;</a>
                 </div>
             </div>
-        }
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+                <span class="text-muted small fw-semibold">SECURITY AUDIT EVENTS</span>
+                <div class="h3 fw-bold text-info mb-0 mt-1">@ViewBag.TotalAuditLogs</div>
+                <div class="small mt-2">
+                    <a asp-action="AuditLogs" class="text-info text-decoration-none">View audit logs &rarr;</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+                <span class="text-muted small fw-semibold">MASTER CUSTOMERS</span>
+                <div class="h3 fw-bold text-success mb-0 mt-1">@ViewBag.TotalCustomers</div>
+                <div class="small mt-2">
+                    <a asp-controller="Customer" asp-action="Index" class="text-success text-decoration-none">Customer directory &rarr;</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+                <span class="text-muted small fw-semibold">OPPORTUNITY DEALS</span>
+                <div class="h3 fw-bold text-warning mb-0 mt-1">@ViewBag.TotalOpportunities</div>
+                <div class="small mt-2">
+                    <a asp-controller="Opportunity" asp-action="Index" class="text-warning text-decoration-none">Sales pipeline &rarr;</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Modules Navigation -->
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="acxiom-card p-4 h-100">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="stat-icon" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">User & Role Management</h5>
+                        <p class="text-muted small mb-0">Manage system users, primary roles, and lockout states.</p>
+                    </div>
+                </div>
+                <p class="text-light small">
+                    Create new team accounts, assign roles (Administrator, Sales Manager, Sales Executive), and manage account lockout status when failed login thresholds are exceeded.
+                </p>
+                <div class="d-flex gap-2">
+                    <a asp-action="Users" class="btn btn-outline-warning btn-sm">View All Users</a>
+                    <a asp-action="CreateUser" class="btn btn-warning btn-sm fw-semibold">+ Add User</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="acxiom-card p-4 h-100">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="stat-icon" style="background: rgba(14, 165, 233, 0.15); color: #38bdf8;">
+                        <i class="bi bi-journal-check"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Audit Logging & Security</h5>
+                        <p class="text-muted small mb-0">Inspect immutable security and business event logs.</p>
+                    </div>
+                </div>
+                <p class="text-light small">
+                    Every create, update, delete, login, lockout, and password event is recorded in the append-only database audit trail with IP address and timestamps.
+                </p>
+                <a asp-action="AuditLogs" class="btn btn-outline-info btn-sm">Inspect Audit Logs &rarr;</a>
+            </div>
+        </div>
     </div>
 </div>

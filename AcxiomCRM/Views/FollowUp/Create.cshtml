@@ -1,0 +1,95 @@
+@model AcxiomCRM.Models.FollowUp
+@{
+    ViewData["Title"] = "Schedule Follow-Up";
+    Layout = "_Layout";
+}
+
+<div class="container py-4" style="max-width: 800px;">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Schedule Follow-Up</h1>
+            <p class="text-muted small mb-0">Set an interaction reminder for a customer, prospective lead, or deal.</p>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Back to Follow-Ups
+        </a>
+    </div>
+
+    <div class="acxiom-card p-4">
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="FollowUpDate" class="form-label">Scheduled Date & Time <span class="text-danger">*</span></label>
+                    <input asp-for="FollowUpDate" type="datetime-local" class="form-control" required />
+                    <span asp-validation-for="FollowUpDate" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="FollowUpType" class="form-label">Activity Type <span class="text-danger">*</span></label>
+                    <select asp-for="FollowUpType" class="form-select">
+                        <option value="Call">Phone Call</option>
+                        <option value="Meeting">Meeting (In-person / Virtual)</option>
+                        <option value="Email">Email Communication</option>
+                        <option value="Task">General Task</option>
+                    </select>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="Subject" class="form-label">Subject / Purpose <span class="text-danger">*</span></label>
+                    <input asp-for="Subject" class="form-control" placeholder="e.g. Discuss Q4 software migration proposal" required />
+                    <span asp-validation-for="Subject" class="text-danger small"></span>
+                </div>
+
+                <!-- Associations -->
+                <div class="col-md-4">
+                    <label asp-for="CustomerId" class="form-label">Customer Account</label>
+                    <select asp-for="CustomerId" asp-items="ViewBag.CustomersList" class="form-select">
+                        <option value="">-- None / Select Customer --</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="LeadId" class="form-label">Prospective Lead</label>
+                    <select asp-for="LeadId" asp-items="ViewBag.LeadsList" class="form-select">
+                        <option value="">-- None / Select Lead --</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="OpportunityId" class="form-label">Sales Opportunity</label>
+                    <select asp-for="OpportunityId" asp-items="ViewBag.OpportunitiesList" class="form-select">
+                        <option value="">-- None / Select Deal --</option>
+                    </select>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="AssignedTo" class="form-label">Assignee (Sales Rep)</label>
+                    <select asp-for="AssignedTo" asp-items="ViewBag.UsersList" class="form-select">
+                        <option value="">-- Assign to User --</option>
+                    </select>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="Remarks" class="form-label">Meeting Notes & Agenda</label>
+                    <textarea asp-for="Remarks" class="form-control" rows="3" placeholder="Key objectives, talking points, questions to ask..."></textarea>
+                </div>
+            </div>
+
+            <hr class="my-4 border-secondary opacity-50" />
+
+            <div class="d-flex justify-content-end gap-2">
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" class="btn btn-amber px-4">
+                    <i class="bi bi-calendar-check me-1"></i>Save Follow-Up
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

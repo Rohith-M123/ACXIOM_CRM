@@ -1,3 +1,4 @@
+using AcxiomCRM.Services;
 using AcxiomCRM.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -7,21 +8,24 @@ using Microsoft.AspNetCore.Mvc;
 namespace AcxiomCRM.Controllers;
 
 /// <summary>
-/// Handles user authentication: Login and Logout.
+/// Handles user authentication: Login, Logout, and Access Denied with audit logging.
 /// </summary>
 public class AccountController : Controller
 {
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly UserManager<IdentityUser> _userManager;
+    private readonly IAuditService _auditService;
     private readonly ILogger<AccountController> _logger;
 
     public AccountController(
         SignInManager<IdentityUser> signInManager,
         UserManager<IdentityUser> userManager,
+        IAuditService auditService,
         ILogger<AccountController> logger)
     {
         _signInManager = signInManager;
         _userManager = userManager;
+        _auditService = auditService;
         _logger = logger;
     }
 
@@ -48,6 +52,8 @@ public class AccountController : Controller
         if (!ModelState.IsValid)
             return View(model);
 
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+
         var result = await _signInManager.PasswordSignInAsync(
             model.Email,
             model.Password,
@@ -57,18 +63,21 @@ public class AccountController : Controller
         if (result.Succeeded)
         {
             _logger.LogInformation("User {Email} logged in successfully.", model.Email);
+            await _auditService.LogAsync(model.Email, "Login", "Authentication", model.Email, null, "User logged in successfully", ip);
             return LocalRedirect(returnUrl ?? Url.Action("Dashboard", "Home")!);
         }
 
         if (result.IsLockedOut)
         {
             _logger.LogWarning("User {Email} account locked out.", model.Email);
+            await _auditService.LogAsync(model.Email, "Security", "Authentication", model.Email, null, "Account locked out due to repeated failed login attempts", ip);
             ModelState.AddModelError(string.Empty,
                 "Your account is temporarily locked due to too many failed login attempts. Please try again in 15 minutes.");
             return View(model);
         }
 
         _logger.LogWarning("Failed login attempt for {Email}.", model.Email);
+        await _auditService.LogAsync(model.Email, "Failed Login", "Authentication", model.Email, null, "Invalid credentials provided", ip);
         ModelState.AddModelError(string.Empty,
             "Invalid email address or password. Please try again.");
         return View(model);
@@ -80,9 +89,13 @@ public class AccountController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
-        var userName = User.Identity?.Name;
+        var userName = User.Identity?.Name ?? "Unknown";
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+
         await _signInManager.SignOutAsync();
         _logger.LogInformation("User {User} logged out.", userName);
+        await _auditService.LogAsync(userName, "Logout", "Authentication", userName, null, "User logged out", ip);
+
         TempData["SuccessMessage"] = "You have been logged out successfully.";
         return RedirectToAction("Index", "Home");
     }

@@ -1,0 +1,141 @@
+@model AcxiomCRM.Models.Opportunity
+@{
+    ViewData["Title"] = Model.OpportunityName;
+    Layout = "_Layout";
+}
+
+<div class="container-fluid px-lg-4 py-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <h1 class="h3 fw-bold mb-0">@Model.OpportunityName</h1>
+                @if (Model.Stage == "Won") { <span class="badge bg-success">Won</span> }
+                else if (Model.Stage == "Lost") { <span class="badge bg-danger">Lost</span> }
+                else if (Model.Stage == "Negotiation") { <span class="badge bg-primary">Negotiation</span> }
+                else if (Model.Stage == "Proposal") { <span class="badge bg-warning text-dark">Proposal</span> }
+                else { <span class="badge bg-info text-dark">Qualification</span> }
+            </div>
+            <p class="text-muted small mb-0">
+                Created on @Model.CreatedDate.ToString("MMMM dd, yyyy") &bull; Status: <strong class="text-light">@Model.Status</strong>
+            </p>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>Deals List
+            </a>
+            <a asp-action="Edit" asp-route-id="@Model.OpportunityId" class="btn btn-outline-warning btn-sm">
+                <i class="bi bi-pencil me-1"></i>Edit Deal
+            </a>
+            <a asp-controller="FollowUp" asp-action="Create" asp-route-opportunityId="@Model.OpportunityId" class="btn btn-outline-success btn-sm">
+                <i class="bi bi-calendar-plus me-1"></i>Schedule Follow-Up
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Deal Info Cards -->
+        <div class="col-lg-5">
+            <div class="acxiom-card p-4 mb-4">
+                <h6 class="fw-bold text-light mb-3 pb-2 border-bottom border-secondary">
+                    <i class="bi bi-currency-dollar text-warning me-2"></i>Financial & Deal Terms
+                </h6>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-6">
+                        <label class="text-muted small d-block">Contract Value</label>
+                        <span class="h4 fw-bold text-warning mb-0">$@Model.Amount.ToString("N0")</span>
+                    </div>
+                    <div class="col-6">
+                        <label class="text-muted small d-block">Probability</label>
+                        <span class="h4 fw-bold text-light mb-0">@Model.Probability%</span>
+                    </div>
+                    <div class="col-12">
+                        <label class="text-muted small d-block">Weighted Revenue (Amount × Prob / 100)</label>
+                        <span class="h5 fw-bold text-success mb-0">$@Model.WeightedAmount.ToString("N0")</span>
+                    </div>
+                </div>
+
+                <hr class="border-secondary opacity-50" />
+
+                <div class="mb-3">
+                    <label class="text-muted small d-block">Target Close Date</label>
+                    <span class="text-light fw-medium">@Model.ExpectedCloseDate.ToString("MMMM dd, yyyy")</span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="text-muted small d-block">Client Account</label>
+                    @if (Model.Customer != null)
+                    {
+                        <a asp-controller="Customer" asp-action="Details" asp-route-id="@Model.Customer.CustomerId" class="text-info text-decoration-none fw-medium">
+                            @Model.Customer.CustomerName
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Unlinked to customer</span>
+                    }
+                </div>
+
+                <div class="mb-3">
+                    <label class="text-muted small d-block">Assigned Representative</label>
+                    <span class="text-light">@(Model.AssignedTo ?? "Unassigned")</span>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(Model.Notes))
+                {
+                    <div class="mt-3 pt-2 border-top border-secondary">
+                        <label class="text-muted small d-block">Deal Notes</label>
+                        <p class="text-light small mb-0">@Model.Notes</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Follow-Ups Column -->
+        <div class="col-lg-7">
+            <div class="acxiom-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold text-light mb-0">
+                        <i class="bi bi-calendar2-check text-info me-2"></i>Associated Follow-Ups
+                        <span class="badge bg-secondary ms-2">@Model.FollowUps.Count</span>
+                    </h6>
+                    <a asp-controller="FollowUp" asp-action="Create" asp-route-opportunityId="@Model.OpportunityId" class="btn btn-sm btn-outline-info">
+                        + Schedule Follow-Up
+                    </a>
+                </div>
+
+                @if (!Model.FollowUps.Any())
+                {
+                    <div class="text-center py-4 text-muted small">
+                        No follow-ups recorded for this deal.
+                    </div>
+                }
+                else
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var f in Model.FollowUps.OrderByDescending(f => f.FollowUpDate))
+                        {
+                            <div class="list-group-item bg-transparent text-light border-secondary px-0 py-2 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-semibold small">
+                                        <span class="badge bg-primary me-1">@f.FollowUpType</span>
+                                        @(f.Subject ?? "Deal follow-up")
+                                    </div>
+                                    <div class="text-muted" style="font-size:0.78rem;">
+                                        Date: <strong class="text-light">@f.FollowUpDate.ToString("MMM dd, yyyy HH:mm")</strong>
+                                        @if (!string.IsNullOrWhiteSpace(f.Remarks)) { <span> &bull; @f.Remarks</span> }
+                                    </div>
+                                </div>
+                                <span class="badge @(f.Status == "Completed" ? "bg-success" : (f.Status == "Planned" ? "bg-warning text-dark" : "bg-danger"))">
+                                    @f.Status
+                                </span>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

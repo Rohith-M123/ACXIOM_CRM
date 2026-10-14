@@ -1,117 +1,333 @@
+@model AcxiomCRM.ViewModels.DashboardViewModel
 @{
     ViewData["Title"] = "Dashboard";
     Layout = "_Layout";
 
     var userEmail = User.Identity?.Name ?? "User";
-    string role = "User";
-    string roleIcon = "bi-person-fill";
-    string roleColor = "warning";
-
-    if (User.IsInRole("Admin"))          { role = "Administrator";    roleIcon = "bi-shield-fill-check"; roleColor = "warning"; }
-    else if (User.IsInRole("Manager"))          { role = "Manager";          roleIcon = "bi-person-workspace";  roleColor = "info"; }
-    else if (User.IsInRole("Sales Executive"))  { role = "Sales Executive";  roleIcon = "bi-graph-up-arrow";    roleColor = "success"; }
-
-    var statCards = new[]
-    {
-        (Icon: "bi-people-fill",          Color: "warning", Title: "Customers",       Sub: "Coming in Phase 2", Value: "0"),
-        (Icon: "bi-funnel-fill",          Color: "info",    Title: "Leads",            Sub: "Coming in Phase 2", Value: "0"),
-        (Icon: "bi-briefcase-fill",       Color: "success", Title: "Opportunities",    Sub: "Coming in Phase 2", Value: "0"),
-        (Icon: "bi-calendar-check-fill",  Color: "danger",  Title: "Follow-ups Due",   Sub: "Coming in Phase 2", Value: "0")
-    };
+    string roleName = "Sales Executive";
+    if (User.IsInRole("Admin")) roleName = "Administrator";
+    else if (User.IsInRole("Manager")) roleName = "Sales Manager";
 }
 
-<div class="container py-5">
+<div class="container-fluid px-lg-4 py-4">
 
-    <!-- Welcome Header -->
-    <div class="d-flex align-items-center gap-3 mb-4">
-        <div class="stat-icon" style="background:rgba(245,158,11,0.15); width:56px; height:56px; border-radius:14px;">
-            <i class="bi @roleIcon text-@roleColor" style="font-size:1.6rem;"></i>
-        </div>
+    <!-- Header & Quick Actions -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <div>
-            <h1 class="h3 fw-bold mb-0">
-                Welcome back, <span class="text-amber">@userEmail</span>
+            <h1 class="h3 fw-bold mb-1">
+                Dashboard Overview
             </h1>
-            <p class="text-muted mb-0 small">Signed in as <strong class="text-@roleColor">@role</strong></p>
-        </div>
-    </div>
-
-    <!-- Phase 1 Notice -->
-    <div class="acxiom-card p-4 mb-4 d-flex align-items-start gap-3">
-        <i class="bi bi-info-circle-fill text-amber mt-1" style="font-size:1.3rem; flex-shrink:0;"></i>
-        <div>
-            <h6 class="fw-bold mb-1">Phase 1 — Foundation Complete ✓</h6>
-            <p class="text-muted mb-0 small">
-                Authentication, role-based authorization, and database connectivity are fully configured.
-                Customer, lead, and opportunity modules will be added in Phase 2.
+            <p class="text-muted small mb-0">
+                Welcome back, <strong class="text-light">@userEmail</strong> &bull; Role: <span class="badge bg-warning text-dark">@roleName</span>
             </p>
         </div>
+
+        <div class="d-flex flex-wrap gap-2">
+            <a asp-controller="Customer" asp-action="Create" class="btn btn-outline-light btn-sm">
+                <i class="bi bi-person-plus-fill me-1"></i>New Customer
+            </a>
+            <a asp-controller="Lead" asp-action="Create" class="btn btn-outline-info btn-sm">
+                <i class="bi bi-funnel me-1"></i>New Lead
+            </a>
+            <a asp-controller="Opportunity" asp-action="Create" class="btn btn-amber btn-sm">
+                <i class="bi bi-briefcase-fill me-1"></i>New Opportunity
+            </a>
+            <a asp-controller="FollowUp" asp-action="Create" class="btn btn-outline-success btn-sm">
+                <i class="bi bi-calendar-plus me-1"></i>Schedule Follow-Up
+            </a>
+        </div>
     </div>
 
-    <!-- Stats Grid -->
-    <div class="row g-4 mb-4">
-        @foreach (var c in statCards)
-        {
-            <div class="col-sm-6 col-xl-3">
-                <div class="stat-card">
-                    <div class="stat-icon" style="background:rgba(255,255,255,0.06);">
-                        <i class="bi @c.Icon text-@c.Color"></i>
+    <!-- KPI Metric Cards Grid -->
+    <div class="row g-3 mb-4">
+        <!-- Customers -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted small fw-semibold">TOTAL CUSTOMERS</span>
+                    <div class="stat-icon" style="background: rgba(14, 165, 233, 0.15); color: #38bdf8;">
+                        <i class="bi bi-people-fill"></i>
                     </div>
-                    <div class="h4 fw-bold mb-0">@c.Value</div>
-                    <div class="fw-semibold small mb-1">@c.Title</div>
-                    <div class="text-muted" style="font-size:0.73rem;">@c.Sub</div>
+                </div>
+                <div class="h3 fw-bold mb-1">@Model.TotalCustomers</div>
+                <div class="text-muted small">
+                    <a asp-controller="Customer" asp-action="Index" class="text-decoration-none text-info">View directory &rarr;</a>
                 </div>
             </div>
-        }
+        </div>
+
+        <!-- Leads -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted small fw-semibold">ACTIVE LEADS</span>
+                    <div class="stat-icon" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">
+                        <i class="bi bi-funnel-fill"></i>
+                    </div>
+                </div>
+                <div class="h3 fw-bold mb-1">@Model.OpenLeads <span class="fs-6 text-muted fw-normal">/ @Model.TotalLeads total</span></div>
+                <div class="text-muted small">
+                    <a asp-controller="Lead" asp-action="Index" class="text-decoration-none text-warning">Manage pipeline &rarr;</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Opportunities -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted small fw-semibold">OPEN DEALS</span>
+                    <div class="stat-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+                        <i class="bi bi-briefcase-fill"></i>
+                    </div>
+                </div>
+                <div class="h3 fw-bold mb-1">@Model.OpenOpportunities <span class="fs-6 text-success fw-normal">(@Model.WonOpportunities Won)</span></div>
+                <div class="text-muted small">
+                    <a asp-controller="Opportunity" asp-action="Index" class="text-decoration-none text-success">View opportunities &rarr;</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pipeline Value -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted small fw-semibold">PIPELINE VALUE</span>
+                    <div class="stat-icon" style="background: rgba(168, 85, 247, 0.15); color: #c084fc;">
+                        <i class="bi bi-currency-dollar"></i>
+                    </div>
+                </div>
+                <div class="h3 fw-bold mb-1 text-warning">$@Model.TotalPipelineValue.ToString("N0")</div>
+                <div class="text-muted small">
+                    Weighted: <span class="text-light fw-medium">$@Model.WeightedPipelineValue.ToString("N0")</span>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Role-Specific Navigation -->
-    <div class="acxiom-card p-4">
-        <h6 class="fw-bold mb-3 text-amber">
-            <i class="bi bi-grid-fill me-2"></i>Your Access Areas
-        </h6>
-        <div class="row g-3">
-            @if (User.IsInRole("Admin"))
-            {
-                <div class="col-md-4">
-                    <a asp-controller="Admin" asp-action="Index"
-                       class="d-flex align-items-center gap-3 p-3 text-decoration-none"
-                       style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.2); border-radius:12px;">
-                        <i class="bi bi-shield-lock-fill text-amber" style="font-size:1.5rem;"></i>
-                        <div>
-                            <div class="fw-semibold text-light">Admin Panel</div>
-                            <div class="text-muted small">Full system control</div>
-                        </div>
-                    </a>
+    <!-- Charts Row -->
+    <div class="row g-3 mb-4">
+        <!-- Opportunity Pipeline Bar Chart -->
+        <div class="col-lg-7">
+            <div class="acxiom-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold mb-0">
+                        <i class="bi bi-bar-chart-fill text-warning me-2"></i>Opportunity Pipeline by Stage
+                    </h6>
+                    <span class="badge bg-dark border border-secondary text-secondary">Active Deals</span>
                 </div>
-            }
-            @if (User.IsInRole("Manager"))
-            {
-                <div class="col-md-4">
-                    <a asp-controller="Manager" asp-action="Index"
-                       class="d-flex align-items-center gap-3 p-3 text-decoration-none"
-                       style="background:rgba(14,165,233,0.08); border:1px solid rgba(14,165,233,0.2); border-radius:12px;">
-                        <i class="bi bi-person-workspace text-info" style="font-size:1.5rem;"></i>
-                        <div>
-                            <div class="fw-semibold text-light">Manager Panel</div>
-                            <div class="text-muted small">Team & oversight</div>
-                        </div>
-                    </a>
+                <div style="height: 260px; position: relative;">
+                    <canvas id="pipelineChart"></canvas>
                 </div>
-            }
-            @if (User.IsInRole("Sales Executive"))
-            {
-                <div class="col-md-4">
-                    <a asp-controller="Sales" asp-action="Index"
-                       class="d-flex align-items-center gap-3 p-3 text-decoration-none"
-                       style="background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.2); border-radius:12px;">
-                        <i class="bi bi-graph-up-arrow text-success" style="font-size:1.5rem;"></i>
-                        <div>
-                            <div class="fw-semibold text-light">Sales Panel</div>
-                            <div class="text-muted small">Leads & pipeline</div>
-                        </div>
-                    </a>
+            </div>
+        </div>
+
+        <!-- Lead Status Donut Chart -->
+        <div class="col-lg-5">
+            <div class="acxiom-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold mb-0">
+                        <i class="bi bi-pie-chart-fill text-info me-2"></i>Lead Status Breakdown
+                    </h6>
+                    <span class="badge bg-dark border border-secondary text-secondary">All Leads</span>
                 </div>
-            }
+                <div style="height: 260px; position: relative;">
+                    <canvas id="leadStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity & Lists Row -->
+    <div class="row g-3">
+        <!-- Upcoming Follow-Ups -->
+        <div class="col-lg-6">
+            <div class="acxiom-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold mb-0">
+                        <i class="bi bi-calendar-event text-danger me-2"></i>Upcoming Follow-Ups
+                        <span class="badge bg-danger ms-2">@Model.PendingFollowUpsCount</span>
+                    </h6>
+                    <a asp-controller="FollowUp" asp-action="Index" class="btn btn-sm btn-outline-secondary">View All</a>
+                </div>
+
+                @if (!Model.UpcomingFollowUps.Any())
+                {
+                    <div class="text-center py-4 text-muted small">
+                        <i class="bi bi-check2-circle fs-3 d-block mb-1 text-success"></i>
+                        No pending follow-ups scheduled.
+                    </div>
+                }
+                else
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var f in Model.UpcomingFollowUps)
+                        {
+                            <div class="list-group-item bg-transparent text-light border-secondary px-0 py-2 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-semibold small">
+                                        <span class="badge bg-primary me-1">@f.FollowUpType</span>
+                                        @(f.Subject ?? "Follow-up")
+                                    </div>
+                                    <div class="text-muted" style="font-size: 0.78rem;">
+                                        Due: <strong class="text-warning">@f.FollowUpDate.ToString("MMM dd, yyyy HH:mm")</strong>
+                                        @if (f.Customer != null) { <span> &bull; Customer: @f.Customer.CustomerName</span> }
+                                        @if (f.Lead != null) { <span> &bull; Lead: @f.Lead.LeadName</span> }
+                                    </div>
+                                </div>
+                                <a asp-controller="FollowUp" asp-action="Index" class="btn btn-sm btn-outline-light py-0 px-2" style="font-size:0.75rem;">Action</a>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Recent Opportunities -->
+        <div class="col-lg-6">
+            <div class="acxiom-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold mb-0">
+                        <i class="bi bi-lightning-charge-fill text-warning me-2"></i>Recent Opportunities
+                    </h6>
+                    <a asp-controller="Opportunity" asp-action="Index" class="btn btn-sm btn-outline-secondary">View All</a>
+                </div>
+
+                @if (!Model.RecentOpportunities.Any())
+                {
+                    <div class="text-center py-4 text-muted small">
+                        No opportunities recorded yet.
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-dark-custom table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Deal</th>
+                                    <th>Customer</th>
+                                    <th>Amount</th>
+                                    <th>Stage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var o in Model.RecentOpportunities)
+                                {
+                                    <tr>
+                                        <td class="fw-semibold">
+                                            <a asp-controller="Opportunity" asp-action="Details" asp-route-id="@o.OpportunityId" class="text-light text-decoration-none">
+                                                @o.OpportunityName
+                                            </a>
+                                        </td>
+                                        <td class="small text-muted">@(o.Customer?.CustomerName ?? "—")</td>
+                                        <td class="fw-bold text-warning">$@o.Amount.ToString("N0")</td>
+                                        <td>
+                                            <span class="badge bg-secondary" style="font-size: 0.7rem;">@o.Stage</span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // 1. Pipeline Bar Chart
+        const stageLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.PipelineStageAmounts.Keys));
+        const stageValues = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.PipelineStageAmounts.Values));
+
+        const ctxPipeline = document.getElementById('pipelineChart');
+        if (ctxPipeline) {
+            new Chart(ctxPipeline, {
+                type: 'bar',
+                data: {
+                    labels: stageLabels,
+                    datasets: [{
+                        label: 'Stage Value ($)',
+                        data: stageValues,
+                        backgroundColor: [
+                            'rgba(56, 189, 248, 0.7)',
+                            'rgba(245, 158, 11, 0.7)',
+                            'rgba(168, 85, 247, 0.7)',
+                            'rgba(16, 185, 129, 0.7)',
+                            'rgba(239, 68, 68, 0.7)'
+                        ],
+                        borderColor: [
+                            '#38bdf8',
+                            '#f59e0b',
+                            '#a855f7',
+                            '#10b981',
+                            '#ef4444'
+                        ],
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                color: '#94a3b8',
+                                callback: function (v) { return '$' + v.toLocaleString(); }
+                            },
+                            grid: { color: 'rgba(51, 65, 85, 0.4)' }
+                        },
+                        x: {
+                            ticks: { color: '#94a3b8' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 2. Lead Status Donut Chart
+        const leadLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.LeadStatusCounts.Keys));
+        const leadValues = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.LeadStatusCounts.Values));
+
+        const ctxLeads = document.getElementById('leadStatusChart');
+        if (ctxLeads) {
+            new Chart(ctxLeads, {
+                type: 'doughnut',
+                data: {
+                    labels: leadLabels,
+                    datasets: [{
+                        data: leadValues,
+                        backgroundColor: [
+                            '#38bdf8',
+                            '#f59e0b',
+                            '#10b981',
+                            '#6366f1',
+                            '#ef4444'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#1e293b'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#cbd5e1', boxWidth: 12, padding: 12 }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+}

@@ -47,6 +47,9 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
 });
 
+// ─── Application Services ───────────────────────────────────────────────────
+builder.Services.AddScoped<IAuditService, AuditService>();
+
 // ─── MVC ─────────────────────────────────────────────────────────────────────
 builder.Services.AddControllersWithViews();
 
