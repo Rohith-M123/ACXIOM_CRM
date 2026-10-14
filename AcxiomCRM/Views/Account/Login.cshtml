@@ -1,0 +1,118 @@
+@model AcxiomCRM.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Sign In";
+    Layout = "_Layout";
+}
+
+<section class="login-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-sm-10 col-md-7 col-lg-5 col-xl-4">
+
+                <!-- Logo -->
+                <div class="text-center mb-4">
+                    <span class="d-inline-flex align-items-center gap-2 mb-2">
+                        <i class="bi bi-diagram-3-fill text-amber" style="font-size:2rem;"></i>
+                        <span class="fw-bold" style="font-size:1.6rem;">Acxiom<span class="text-amber">CRM</span></span>
+                    </span>
+                    <p class="text-muted small mb-0">Sign in to continue to your dashboard</p>
+                </div>
+
+                <div class="login-card">
+                    <h5 class="fw-bold mb-1">Welcome back</h5>
+                    <p class="text-muted small mb-4">Enter your credentials to access your account.</p>
+
+                    <!-- Validation Summary -->
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger d-flex align-items-start gap-2 py-2 px-3 mb-3" style="border-radius:10px; font-size:0.875rem;">
+                            <i class="bi bi-exclamation-triangle-fill mt-1 flex-shrink-0"></i>
+                            <div asp-validation-summary="All"></div>
+                        </div>
+                    }
+
+                    <form asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post" novalidate>
+                        @Html.AntiForgeryToken()
+
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label">
+                                <i class="bi bi-envelope me-1"></i>Email Address
+                            </label>
+                            <input asp-for="Email"
+                                   class="form-control"
+                                   placeholder="you@example.com"
+                                   autocomplete="username"
+                                   id="emailInput" />
+                            <span asp-validation-for="Email" class="field-validation-error"></span>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <label asp-for="Password" class="form-label mb-0">
+                                    <i class="bi bi-lock me-1"></i>Password
+                                </label>
+                            </div>
+                            <div class="position-relative mt-1">
+                                <input asp-for="Password"
+                                       class="form-control pe-5"
+                                       placeholder="Enter your password"
+                                       autocomplete="current-password"
+                                       id="passwordInput" />
+                                <button type="button" id="togglePassword"
+                                        class="btn btn-link position-absolute top-50 end-0 translate-middle-y pe-3 text-muted p-0"
+                                        style="text-decoration:none; z-index:5;"
+                                        onclick="togglePwd()">
+                                    <i class="bi bi-eye" id="eyeIcon"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Password" class="field-validation-error"></span>
+                        </div>
+
+                        <!-- Remember Me -->
+                        <div class="mb-4 d-flex align-items-center gap-2">
+                            <input asp-for="RememberMe" class="form-check-input m-0" id="rememberMeCheck"
+                                   style="width:16px; height:16px; accent-color: var(--acxiom-amber);" />
+                            <label for="rememberMeCheck" class="form-label mb-0">Keep me signed in</label>
+                        </div>
+
+                        <!-- Submit -->
+                        <button type="submit" id="loginBtn" class="btn btn-amber w-100 py-2">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                        </button>
+                    </form>
+                </div>
+
+                <p class="text-center text-muted small mt-4">
+                    <i class="bi bi-shield-lock me-1"></i>
+                    This system is for authorised users only. All activity is monitored.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScripts" />
+    <script>
+        function togglePwd() {
+            const inp = document.getElementById('passwordInput');
+            const icon = document.getElementById('eyeIcon');
+            if (inp.type === 'password') {
+                inp.type = 'text';
+                icon.className = 'bi bi-eye-slash';
+            } else {
+                inp.type = 'password';
+                icon.className = 'bi bi-eye';
+            }
+        }
+
+        // Add loading state on submit
+        document.querySelector('form').addEventListener('submit', function () {
+            const btn = document.getElementById('loginBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Signing in...';
+        });
+    </script>
+}

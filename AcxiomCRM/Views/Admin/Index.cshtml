@@ -1,0 +1,70 @@
+@{
+    ViewData["Title"] = "Admin Panel";
+    Layout = "_Layout";
+
+    var modules = new[]
+    {
+        (Icon: "bi-people-fill",              Color: "warning", Title: "User Management",  Desc: "Manage user accounts, roles, and permissions.",              Active: true),
+        (Icon: "bi-database-fill-gear",       Color: "info",    Title: "System Settings",  Desc: "Configure application-wide settings and preferences.",       Active: false),
+        (Icon: "bi-file-earmark-bar-graph-fill", Color: "success", Title: "Audit Logs",   Desc: "View all system activity and user actions.",                 Active: false),
+        (Icon: "bi-envelope-fill",            Color: "danger",  Title: "Notifications",   Desc: "Configure system alerts and email notifications.",           Active: false)
+    };
+}
+
+<div class="role-header">
+    <div class="container">
+        <div class="d-flex align-items-center gap-3">
+            <div class="stat-icon" style="background:rgba(245,158,11,0.2); width:56px; height:56px; border-radius:14px; flex-shrink:0;">
+                <i class="bi bi-shield-lock-fill text-warning" style="font-size:1.6rem;"></i>
+            </div>
+            <div>
+                <span class="badge bg-warning text-dark mb-1" style="font-size:0.7rem; letter-spacing:1px;">ADMIN ONLY</span>
+                <h1 class="h3 fw-bold mb-0">Administration Panel</h1>
+                <p class="text-muted mb-0 small">Full system access — restricted to Administrators</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+
+    <!-- Authorization verified card -->
+    <div class="acxiom-card p-4 mb-4 d-flex align-items-start gap-3"
+         style="border-left:3px solid var(--acxiom-amber);">
+        <i class="bi bi-check-circle-fill text-amber mt-1" style="font-size:1.3rem; flex-shrink:0;"></i>
+        <div>
+            <h6 class="fw-bold mb-1 text-amber">Authorization Verified ✓</h6>
+            <p class="text-muted mb-0 small">
+                You are signed in as <strong class="text-light">@User.Identity?.Name</strong> with the
+                <strong class="text-warning">Admin</strong> role.
+                This page is correctly restricted — only Administrators can see this.
+            </p>
+        </div>
+    </div>
+
+    <h6 class="text-muted text-uppercase fw-bold small mb-3">
+        <i class="bi bi-grid me-2"></i>Administration Modules
+    </h6>
+    <div class="row g-4">
+        @foreach (var m in modules)
+        {
+            <div class="col-sm-6 col-xl-3">
+                <div class="stat-card h-100 @(m.Active ? "" : "opacity-50")">
+                    <div class="stat-icon" style="background:rgba(255,255,255,0.06);">
+                        <i class="bi @m.Icon text-@m.Color"></i>
+                    </div>
+                    <div class="fw-semibold mb-1">@m.Title</div>
+                    <div class="text-muted small mb-2">@m.Desc</div>
+                    @if (m.Active)
+                    {
+                        <span class="badge" style="background:rgba(245,158,11,0.2); color:var(--acxiom-amber); font-size:0.65rem;">Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary" style="font-size:0.65rem;">Phase 2</span>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>

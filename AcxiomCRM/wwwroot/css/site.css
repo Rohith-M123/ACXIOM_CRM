@@ -1,0 +1,287 @@
+/* ================================================================
+   AcxiomCRM — Site Styles
+   Base theme: Deep Navy + Amber accent
+   ================================================================ */
+
+:root {
+    --acxiom-navy: #0d1b2a;
+    --acxiom-navy-mid: #1b2a3b;
+    --acxiom-blue: #1e3a5f;
+    --acxiom-amber: #f59e0b;
+    --acxiom-amber-light: #fcd34d;
+    --acxiom-text: #e2e8f0;
+    --acxiom-muted: #94a3b8;
+    --acxiom-card-bg: rgba(255, 255, 255, 0.04);
+    --acxiom-border: rgba(255, 255, 255, 0.08);
+}
+
+/* Global */
+html, body {
+    height: 100%;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--acxiom-navy);
+    color: var(--acxiom-text);
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* ── Navbar ──────────────────────────────────────────── */
+.acxiom-navbar {
+    background: linear-gradient(135deg, var(--acxiom-navy) 0%, var(--acxiom-blue) 100%);
+    border-bottom: 1px solid var(--acxiom-border);
+    min-height: 64px;
+    padding: 0.6rem 0;
+}
+
+.acxiom-navbar .navbar-brand {
+    font-size: 1.3rem;
+    letter-spacing: -0.5px;
+}
+
+.acxiom-navbar .nav-link {
+    color: rgba(255,255,255,0.8) !important;
+    transition: color 0.2s ease;
+    font-weight: 500;
+    padding: 0.4rem 0.85rem;
+    border-radius: 6px;
+}
+
+.acxiom-navbar .nav-link:hover,
+.acxiom-navbar .nav-link.active {
+    color: var(--acxiom-amber) !important;
+    background: rgba(245, 158, 11, 0.1);
+}
+
+/* Role badge in navbar */
+.acxiom-role-badge {
+    background: linear-gradient(135deg, var(--acxiom-amber) 0%, #d97706 100%);
+    color: #1a1a1a;
+    font-weight: 600;
+    font-size: 0.7rem;
+    padding: 0.3em 0.65em;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+}
+
+/* ── Footer ──────────────────────────────────────────── */
+.acxiom-footer {
+    background: var(--acxiom-navy-mid);
+    border-top: 1px solid var(--acxiom-border);
+}
+
+/* ── Cards ───────────────────────────────────────────── */
+.acxiom-card {
+    background: var(--acxiom-card-bg);
+    border: 1px solid var(--acxiom-border);
+    border-radius: 16px;
+    backdrop-filter: blur(12px);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.acxiom-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Hero Section ────────────────────────────────────── */
+.acxiom-hero {
+    background: linear-gradient(160deg, var(--acxiom-navy) 0%, var(--acxiom-blue) 60%, #0a2540 100%);
+    min-height: 82vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.acxiom-hero::before {
+    content: '';
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(245,158,11,0.08) 0%, transparent 70%);
+    top: -150px;
+    right: -100px;
+    pointer-events: none;
+}
+
+.acxiom-hero::after {
+    content: '';
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(30,58,95,0.6) 0%, transparent 70%);
+    bottom: -100px;
+    left: -50px;
+    pointer-events: none;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(245,158,11,0.15);
+    border: 1px solid rgba(245,158,11,0.3);
+    color: var(--acxiom-amber-light);
+    padding: 0.35rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+}
+
+/* ── Dashboard Stats ─────────────────────────────────── */
+.stat-card {
+    background: linear-gradient(135deg, var(--acxiom-navy-mid), var(--acxiom-blue));
+    border: 1px solid var(--acxiom-border);
+    border-radius: 14px;
+    padding: 1.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+}
+
+.stat-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+}
+
+/* ── Role Page Headers ───────────────────────────────── */
+.role-header {
+    background: linear-gradient(135deg, var(--acxiom-navy-mid), var(--acxiom-blue));
+    border-bottom: 2px solid var(--acxiom-amber);
+    padding: 2.5rem 0;
+}
+
+/* ── Login Card ──────────────────────────────────────── */
+.login-section {
+    min-height: calc(100vh - 130px);
+    display: flex;
+    align-items: center;
+    background: linear-gradient(160deg, var(--acxiom-navy) 0%, var(--acxiom-blue) 100%);
+}
+
+.login-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--acxiom-border);
+    border-radius: 20px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    padding: 2.5rem;
+}
+
+/* ── Form Controls ───────────────────────────────────── */
+.form-control, .form-select {
+    background: rgba(255,255,255,0.06) !important;
+    border: 1px solid rgba(255,255,255,0.12) !important;
+    color: var(--acxiom-text) !important;
+    border-radius: 10px !important;
+    padding: 0.65rem 1rem !important;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--acxiom-amber) !important;
+    box-shadow: 0 0 0 3px rgba(245,158,11,0.2) !important;
+    background: rgba(255,255,255,0.08) !important;
+}
+
+.form-control::placeholder {
+    color: var(--acxiom-muted) !important;
+}
+
+.form-label {
+    color: var(--acxiom-muted);
+    font-weight: 500;
+    font-size: 0.875rem;
+    margin-bottom: 0.4rem;
+}
+
+/* ── Buttons ─────────────────────────────────────────── */
+.btn-amber {
+    background: linear-gradient(135deg, var(--acxiom-amber), #d97706);
+    color: #1a1a1a;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    padding: 0.65rem 1.5rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-amber:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(245,158,11,0.35);
+    color: #1a1a1a;
+}
+
+.btn-amber:active {
+    transform: translateY(0);
+}
+
+/* ── Text helpers ────────────────────────────────────── */
+.text-amber { color: var(--acxiom-amber) !important; }
+.text-muted { color: var(--acxiom-muted) !important; }
+.border-amber { border-color: var(--acxiom-amber) !important; }
+
+/* ── Validation ──────────────────────────────────────── */
+.text-danger { color: #f87171 !important; }
+.field-validation-error { color: #f87171; font-size: 0.8rem; }
+.input-validation-error { border-color: #f87171 !important; }
+.validation-summary-errors ul { margin: 0; padding-left: 1.2rem; }
+
+/* ── Access Denied Page ──────────────────────────────── */
+.access-denied-icon {
+    font-size: 5rem;
+    color: var(--acxiom-amber);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* ── Utility ─────────────────────────────────────────── */
+.divider-text {
+    position: relative;
+    text-align: center;
+    color: var(--acxiom-muted);
+    font-size: 0.8rem;
+}
+
+.divider-text::before, .divider-text::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 40%;
+    height: 1px;
+    background: var(--acxiom-border);
+}
+
+.divider-text::before { left: 0; }
+.divider-text::after { right: 0; }
+
+/* Responsive tweaks */
+@media (max-width: 576px) {
+    .login-card { padding: 1.5rem; }
+    .acxiom-hero { min-height: 70vh; }
+}

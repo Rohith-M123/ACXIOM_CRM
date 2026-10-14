@@ -1,0 +1,59 @@
+@{
+    ViewData["Title"] = "Sales Panel";
+    Layout = "_Layout";
+
+    var modules = new[]
+    {
+        (Icon: "bi-funnel-fill",         Color: "warning", Title: "My Leads",       Desc: "View and manage your assigned leads."),
+        (Icon: "bi-briefcase-fill",      Color: "info",    Title: "Opportunities",  Desc: "Track your active sales opportunities."),
+        (Icon: "bi-person-lines-fill",   Color: "success", Title: "My Customers",   Desc: "View customers in your territory."),
+        (Icon: "bi-bell-fill",           Color: "danger",  Title: "Follow-ups",     Desc: "See today's follow-up tasks and reminders.")
+    };
+}
+
+<div class="role-header">
+    <div class="container">
+        <div class="d-flex align-items-center gap-3">
+            <div class="stat-icon" style="background:rgba(34,197,94,0.2); width:56px; height:56px; border-radius:14px; flex-shrink:0;">
+                <i class="bi bi-graph-up-arrow text-success" style="font-size:1.6rem;"></i>
+            </div>
+            <div>
+                <span class="badge bg-success mb-1" style="font-size:0.7rem; letter-spacing:1px;">SALES EXEC ONLY</span>
+                <h1 class="h3 fw-bold mb-0">Sales Executive Panel</h1>
+                <p class="text-muted mb-0 small">Leads, opportunities & pipeline — restricted to Sales Executives</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+
+    <div class="acxiom-card p-4 mb-4 d-flex align-items-start gap-3"
+         style="border-left:3px solid #22c55e;">
+        <i class="bi bi-check-circle-fill text-success mt-1" style="font-size:1.3rem; flex-shrink:0;"></i>
+        <div>
+            <h6 class="fw-bold mb-1 text-success">Authorization Verified ✓</h6>
+            <p class="text-muted mb-0 small">
+                You are signed in as <strong class="text-light">@User.Identity?.Name</strong> with the
+                <strong class="text-success">Sales Executive</strong> role.
+                This page is correctly restricted — only Sales Executives can see this.
+            </p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        @foreach (var m in modules)
+        {
+            <div class="col-sm-6 col-xl-3">
+                <div class="stat-card h-100 opacity-50">
+                    <div class="stat-icon" style="background:rgba(255,255,255,0.06);">
+                        <i class="bi @m.Icon text-@m.Color"></i>
+                    </div>
+                    <div class="fw-semibold mb-1">@m.Title</div>
+                    <div class="text-muted small mb-2">@m.Desc</div>
+                    <span class="badge bg-secondary" style="font-size:0.65rem;">Phase 2</span>
+                </div>
+            </div>
+        }
+    </div>
+</div>

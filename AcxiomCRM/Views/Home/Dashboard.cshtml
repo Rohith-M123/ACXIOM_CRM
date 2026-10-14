@@ -1,0 +1,117 @@
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "_Layout";
+
+    var userEmail = User.Identity?.Name ?? "User";
+    string role = "User";
+    string roleIcon = "bi-person-fill";
+    string roleColor = "warning";
+
+    if (User.IsInRole("Admin"))          { role = "Administrator";    roleIcon = "bi-shield-fill-check"; roleColor = "warning"; }
+    else if (User.IsInRole("Manager"))          { role = "Manager";          roleIcon = "bi-person-workspace";  roleColor = "info"; }
+    else if (User.IsInRole("Sales Executive"))  { role = "Sales Executive";  roleIcon = "bi-graph-up-arrow";    roleColor = "success"; }
+
+    var statCards = new[]
+    {
+        (Icon: "bi-people-fill",          Color: "warning", Title: "Customers",       Sub: "Coming in Phase 2", Value: "0"),
+        (Icon: "bi-funnel-fill",          Color: "info",    Title: "Leads",            Sub: "Coming in Phase 2", Value: "0"),
+        (Icon: "bi-briefcase-fill",       Color: "success", Title: "Opportunities",    Sub: "Coming in Phase 2", Value: "0"),
+        (Icon: "bi-calendar-check-fill",  Color: "danger",  Title: "Follow-ups Due",   Sub: "Coming in Phase 2", Value: "0")
+    };
+}
+
+<div class="container py-5">
+
+    <!-- Welcome Header -->
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <div class="stat-icon" style="background:rgba(245,158,11,0.15); width:56px; height:56px; border-radius:14px;">
+            <i class="bi @roleIcon text-@roleColor" style="font-size:1.6rem;"></i>
+        </div>
+        <div>
+            <h1 class="h3 fw-bold mb-0">
+                Welcome back, <span class="text-amber">@userEmail</span>
+            </h1>
+            <p class="text-muted mb-0 small">Signed in as <strong class="text-@roleColor">@role</strong></p>
+        </div>
+    </div>
+
+    <!-- Phase 1 Notice -->
+    <div class="acxiom-card p-4 mb-4 d-flex align-items-start gap-3">
+        <i class="bi bi-info-circle-fill text-amber mt-1" style="font-size:1.3rem; flex-shrink:0;"></i>
+        <div>
+            <h6 class="fw-bold mb-1">Phase 1 — Foundation Complete ✓</h6>
+            <p class="text-muted mb-0 small">
+                Authentication, role-based authorization, and database connectivity are fully configured.
+                Customer, lead, and opportunity modules will be added in Phase 2.
+            </p>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="row g-4 mb-4">
+        @foreach (var c in statCards)
+        {
+            <div class="col-sm-6 col-xl-3">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:rgba(255,255,255,0.06);">
+                        <i class="bi @c.Icon text-@c.Color"></i>
+                    </div>
+                    <div class="h4 fw-bold mb-0">@c.Value</div>
+                    <div class="fw-semibold small mb-1">@c.Title</div>
+                    <div class="text-muted" style="font-size:0.73rem;">@c.Sub</div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Role-Specific Navigation -->
+    <div class="acxiom-card p-4">
+        <h6 class="fw-bold mb-3 text-amber">
+            <i class="bi bi-grid-fill me-2"></i>Your Access Areas
+        </h6>
+        <div class="row g-3">
+            @if (User.IsInRole("Admin"))
+            {
+                <div class="col-md-4">
+                    <a asp-controller="Admin" asp-action="Index"
+                       class="d-flex align-items-center gap-3 p-3 text-decoration-none"
+                       style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.2); border-radius:12px;">
+                        <i class="bi bi-shield-lock-fill text-amber" style="font-size:1.5rem;"></i>
+                        <div>
+                            <div class="fw-semibold text-light">Admin Panel</div>
+                            <div class="text-muted small">Full system control</div>
+                        </div>
+                    </a>
+                </div>
+            }
+            @if (User.IsInRole("Manager"))
+            {
+                <div class="col-md-4">
+                    <a asp-controller="Manager" asp-action="Index"
+                       class="d-flex align-items-center gap-3 p-3 text-decoration-none"
+                       style="background:rgba(14,165,233,0.08); border:1px solid rgba(14,165,233,0.2); border-radius:12px;">
+                        <i class="bi bi-person-workspace text-info" style="font-size:1.5rem;"></i>
+                        <div>
+                            <div class="fw-semibold text-light">Manager Panel</div>
+                            <div class="text-muted small">Team & oversight</div>
+                        </div>
+                    </a>
+                </div>
+            }
+            @if (User.IsInRole("Sales Executive"))
+            {
+                <div class="col-md-4">
+                    <a asp-controller="Sales" asp-action="Index"
+                       class="d-flex align-items-center gap-3 p-3 text-decoration-none"
+                       style="background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.2); border-radius:12px;">
+                        <i class="bi bi-graph-up-arrow text-success" style="font-size:1.5rem;"></i>
+                        <div>
+                            <div class="fw-semibold text-light">Sales Panel</div>
+                            <div class="text-muted small">Leads & pipeline</div>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

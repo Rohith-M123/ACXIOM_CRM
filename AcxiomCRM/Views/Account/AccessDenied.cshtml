@@ -1,0 +1,51 @@
+@{
+    ViewData["Title"] = "Access Denied";
+    Layout = "_Layout";
+}
+
+<div class="container py-5 text-center">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <div class="access-denied-icon mb-4">
+                <i class="bi bi-shield-x"></i>
+            </div>
+
+            <h1 class="h2 fw-bold mb-2">Access Denied</h1>
+            <p class="text-muted mb-4">
+                You do not have permission to view this page.<br>
+                This area is restricted to users with a specific role.
+            </p>
+
+            <div class="acxiom-card p-4 mb-4 text-start">
+                <h6 class="fw-bold text-amber mb-3">
+                    <i class="bi bi-info-circle me-2"></i>What can I do?
+                </h6>
+                <ul class="text-muted small mb-0" style="padding-left:1.2rem;">
+                    <li class="mb-2">Return to your dashboard and use the areas available for your role.</li>
+                    <li class="mb-2">If you believe you should have access, contact your administrator.</li>
+                    <li>Sign out and sign back in with an account that has the required permissions.</li>
+                </ul>
+            </div>
+
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <a asp-controller="Home" asp-action="Dashboard" class="btn btn-amber px-4">
+                        <i class="bi bi-speedometer2 me-2"></i>Go to Dashboard
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-amber px-4">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                    </a>
+                }
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary px-4"
+                   style="border-color: var(--acxiom-border); color: var(--acxiom-muted);">
+                    <i class="bi bi-house me-2"></i>Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,92 @@
+﻿@{
+    ViewData["Title"] = "Welcome to AcxiomCRM";
+    Layout = "_Layout";
+}
+
+<!-- Hero Section -->
+<section class="acxiom-hero">
+    <div class="container position-relative" style="z-index:1;">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-badge">
+                    <i class="bi bi-stars"></i>
+                    <span>Phase 1 — Foundation</span>
+                </div>
+
+                <h1 class="display-4 fw-bold lh-1 mb-3">
+                    Smarter CRM for<br>
+                    <span class="text-amber">Modern Sales Teams</span>
+                </h1>
+
+                <p class="lead text-muted mb-4" style="font-size:1.05rem;">
+                    AcxiomCRM helps you manage customers, leads, and opportunities — all in one secure, role-based platform designed for growth.
+                </p>
+
+                <div class="d-flex gap-3 flex-wrap">
+                    <a asp-controller="Account" asp-action="Login"
+                       class="btn btn-amber btn-lg px-4 d-flex align-items-center gap-2">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                        Sign In to Dashboard
+                    </a>
+                    <div class="d-flex align-items-center gap-2 text-muted small">
+                        <i class="bi bi-shield-lock-fill text-amber"></i>
+                        <span>Secure, role-based access</span>
+                    </div>
+                </div>
+
+                <!-- Stats row -->
+                <div class="row mt-5 g-3">
+                    <div class="col-4">
+                        <div class="text-center p-3 acxiom-card">
+                            <div class="fw-bold text-amber" style="font-size:1.5rem;">3</div>
+                            <div class="text-muted" style="font-size:0.75rem;">User Roles</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="text-center p-3 acxiom-card">
+                            <div class="fw-bold text-amber" style="font-size:1.5rem;">100%</div>
+                            <div class="text-muted" style="font-size:0.75rem;">Secure Auth</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="text-center p-3 acxiom-card">
+                            <div class="fw-bold text-amber" style="font-size:1.5rem;">.NET</div>
+                            <div class="text-muted" style="font-size:0.75rem;">10 Powered</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 d-none d-lg-flex justify-content-center mt-5 mt-lg-0">
+                <div class="acxiom-card p-4" style="max-width:360px;width:100%;">
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <div class="stat-icon" style="background:rgba(245,158,11,0.15);">
+                            <i class="bi bi-shield-check text-amber" style="font-size:1.6rem;"></i>
+                        </div>
+                        <div>
+                            <div class="fw-semibold">Role-Based Access</div>
+                            <div class="text-muted small">Admin · Manager · Sales Exec</div>
+                        </div>
+                    </div>
+                    <hr style="border-color:var(--acxiom-border);">
+                    <div class="d-flex flex-column gap-3">
+                        @foreach (var item in new[] {
+                            ("bi-person-fill-gear text-warning", "Admin", "Full system access"),
+                            ("bi-person-check-fill text-info", "Manager", "Team & reports access"),
+                            ("bi-graph-up-arrow text-success", "Sales Exec", "Leads & opportunities")
+                        })
+                        {
+                            <div class="d-flex align-items-center gap-3">
+                                <i class="bi @item.Item1" style="font-size:1.3rem;"></i>
+                                <div>
+                                    <div class="fw-medium small">@item.Item2</div>
+                                    <div class="text-muted" style="font-size:0.75rem;">@item.Item3</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
